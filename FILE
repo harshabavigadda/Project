@@ -1,0 +1,37 @@
+!pip install pymupdf
+import os
+output_folder = '/content/drive/MyDrive/Colab Notebooks/output_images'
+os.makedirs(output_folder, exist_ok=True)
+
+import os
+import fitz
+from PIL import Image
+from io import BytesIO
+
+def extract_images_from_pdf(pdf_path, output_folder):
+    doc = fitz.open(pdf_path)
+
+    for page_num in range(doc.page_count):
+        page = doc[page_num]
+        images = page.get_images(full=True)
+
+        for img_index, img_info in enumerate(images):
+            img_index += 1
+            image_index = img_info[0]
+            base_image = doc.extract_image(image_index)
+            image_bytes = base_image["image"]
+
+            image = Image.open(BytesIO(image_bytes))
+            image_path = f"{output_folder}/page{page_num + 1}_img{img_index}.png"
+            image.save(image_path)
+
+            print(f"Image saved: {image_path}")
+
+    doc.close()
+
+
+output_folder = '/content/drive/MyDrive/Colab Notebooks/Images'
+os.makedirs(output_folder, exist_ok=True)
+
+extract_images_from_pdf('/content/drive/MyDrive/Colab Notebooks/AspenIcarusPIDV11_Ref.pdf', output_folder)
+
